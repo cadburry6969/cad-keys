@@ -24,6 +24,20 @@ function HasVehicleKey(plate)
 end
 exports('HasVehicleKey', HasVehicleKey)
 
+function GetVehicleByPlate(kPlate)
+	local vehicle = 0
+	local vehicles = GetGamePool("CVehicle")
+	for _, veh in pairs(vehicles) do
+		local vPlate = GetVehicleNumberPlateText(veh)
+		if kPlate == vPlate then
+			vehicle = veh
+			break
+		end
+	end
+	return vehicle
+end
+exports('GetVehicleByPlate', GetVehicleByPlate)
+
 function LoadAnimDict(dict)
     while (not HasAnimDictLoaded(dict)) do
         RequestAnimDict(dict)
@@ -189,7 +203,7 @@ AddEventHandler("baseevents:enteredVehicle", function(currentVehicle, currentSea
 		while DoesEntityExist(currentVehicle) and IsInVehicle do
 			local veh = currentVehicle
 			local plate = QBCore.Functions.GetPlate(veh)
-			local driver = (currentSeat == -1)
+			local driver = GetPedInVehicleSeat(veh, -1)
 			if driver then
 				if HasVehicleKey(plate) then
 					if not IsVehicleEngineOn then
