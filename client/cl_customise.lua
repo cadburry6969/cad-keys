@@ -1,3 +1,13 @@
+-- ███    ██  ██████  ████████ ██ ███████ ██  ██████  █████  ████████ ██  ██████  ███    ██ ███████ 
+-- ████   ██ ██    ██    ██    ██ ██      ██ ██      ██   ██    ██    ██ ██    ██ ████   ██ ██      
+-- ██ ██  ██ ██    ██    ██    ██ █████   ██ ██      ███████    ██    ██ ██    ██ ██ ██  ██ ███████ 
+-- ██  ██ ██ ██    ██    ██    ██ ██      ██ ██      ██   ██    ██    ██ ██    ██ ██  ██ ██      ██ 
+-- ██   ████  ██████     ██    ██ ██      ██  ██████ ██   ██    ██    ██  ██████  ██   ████ ███████ 
+                                                                                                 
+function ShowNotification(msg)
+    TriggerEvent("QBCore:Notify", msg, "primary", 5000)
+end
+
 -- ██████   ██████  ██      ██  ██████ ███████      █████  ██      ███████ ██████  ████████ 
 -- ██   ██ ██    ██ ██      ██ ██      ██          ██   ██ ██      ██      ██   ██    ██    
 -- ██████  ██    ██ ██      ██ ██      █████       ███████ ██      █████   ██████     ██    
@@ -7,7 +17,7 @@
 function PoliceCall(vehicle)
     if Config.Dispatch == "ps" then
         exports['ps-dispatch']:VehicleTheft(vehicle)
-    elseif Config.Dispatch == "qb"
+    elseif Config.Dispatch == "qb" then
         local ped = PlayerPedId()
         local pos = GetEntityCoords(ped)
         local msg = ''
@@ -61,12 +71,12 @@ function lockpickFinish(success)
     local chance = math.random()
     if success then
         TriggerServerEvent('hud:server:GainStress', math.random(1, 4))
-        QBCore.Functions.Notify(Config.Lang['vehicle_door_opened'], 'success')
+        ShowNotification(Config.Lang['vehicle_door_opened'], 'success')
         SetVehicleDoorsLocked(vehicle, 1)
     else
         PoliceCall(vehicle)
         TriggerServerEvent('hud:server:GainStress', math.random(1, 4))
-        QBCore.Functions.Notify(Config.Lang['pd_was_called'], 'error')
+        ShowNotification(Config.Lang['pd_was_called'], 'error')
     end
     if usingAdvanced then
         if chance <= Config.RemoveLockpickAdvanced then
@@ -88,14 +98,14 @@ function hotwireFinish(success)
     local chance = math.random()
     if success then
         TriggerServerEvent('hud:server:GainStress', math.random(1, 4))
-        QBCore.Functions.Notify(Config.Lang['success.successful_hotwire'], 'success')
+        ShowNotification(Config.Lang['success.successful_hotwire'], 'success')
         SetVehicleDoorsLocked(vehicle, 1)
         local plate = QBCore.Functions.GetPlate(vehicle)
 		AddTempKey(plate)
     else
         PoliceCall(vehicle)
         TriggerServerEvent('hud:server:GainStress', math.random(1, 4))
-        QBCore.Functions.Notify(Config.Lang['error.someone_called_the_police'], 'error')
+        ShowNotification(Config.Lang['pd_was_called'], 'error')
     end
     if usingAdvanced then
         if chance <= Config.RemoveLockpickAdvanced then
@@ -142,3 +152,27 @@ end
 RegisterNetEvent('lockpicks:UseLockpick', function(isAdvanced)
     UseLockpick(isAdvanced)
 end)
+
+-- ██       ██████   ██████ ██   ██     ██    ██ ███████ ██   ██ ██  ██████ ██      ███████ 
+-- ██      ██    ██ ██      ██  ██      ██    ██ ██      ██   ██ ██ ██      ██      ██      
+-- ██      ██    ██ ██      █████       ██    ██ █████   ███████ ██ ██      ██      █████   
+-- ██      ██    ██ ██      ██  ██       ██  ██  ██      ██   ██ ██ ██      ██      ██      
+-- ███████  ██████   ██████ ██   ██       ████   ███████ ██   ██ ██  ██████ ███████ ███████ 
+                                                                                                                                                                                  
+RegisterCommand("lockvehicle", function()
+	TriggerEvent("cad-keys:lockVehicle")
+end, false)
+RegisterKeyMapping('lockvehicle', 'Lock/Unlock Vehicle', 'keyboard', 'L')
+TriggerEvent('chat:removeSuggestion', '/lockvehicle')
+
+-- ███████ ███    ██  ██████  ██ ███    ██ ███████ 
+-- ██      ████   ██ ██       ██ ████   ██ ██      
+-- █████   ██ ██  ██ ██   ███ ██ ██ ██  ██ █████   
+-- ██      ██  ██ ██ ██    ██ ██ ██  ██ ██ ██      
+-- ███████ ██   ████  ██████  ██ ██   ████ ███████ 
+                                                
+RegisterCommand("engine", function()
+	TriggerEvent("cad-keys:toggleEngine")
+end, false)
+RegisterKeyMapping('engine', 'Toggle Engine', 'keyboard', 'G')
+TriggerEvent('chat:addSuggestion', '/engine', 'Turn Vehicle Engine On/Off')

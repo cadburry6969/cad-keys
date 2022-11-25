@@ -14,16 +14,15 @@ Config.CoreName = 'qb-core'
 -- ██      ██   ██ ██  ██ ██ ██    ██ 
 -- ███████ ██   ██ ██   ████  ██████  
                                                                       
-Config.Lang = {	
-	['someone_called_the_police'] = 'Someone called the police!',
+Config.Lang = {
 	['not_enough_money'] = 'Not enough money!',
-	['you_dont_have_the_keys_of_the_vehicle'] = 'You don\'t have the keys of the vehicle..',
-	['successful_hotwire'] = 'Successful hotwire!',
+	['you_dont_have_keys'] = 'You don\'t have the keys of the vehicle.',
+	['successful_hotwire'] = 'You hotwired succesfully!',
 	['vehicle_locked'] = 'Vehicle locked!',
-	['something_went_wrong_with_the_locking_system'] = 'Something went wrong with the locking system!',
-	['vehicle_unlocked'] = 'vehicle_unlocked',
+	['something_gone_wrong'] = 'Something went wrong!',
+	['vehicle_unlocked'] = 'Vehicle unlocked',
 	['vehicle_door_opened'] = 'Door is now open',
-	['pd_was_called'] = 'Someone Called The Police',
+	['pd_was_called'] = 'Someone called the cops!',
 }
 
 --  ██████  ███████ ███    ██ ███████ ██████   █████  ██      

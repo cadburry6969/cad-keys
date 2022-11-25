@@ -1,9 +1,8 @@
-local QBCore = exports[Config.CoreName]:GetCoreObject()
-
-local keylist = {}
-local IsVehicleEngineOn = false
-local isEnteringVehicle = false
-local isInVehicle = false
+KeyList = {}
+IsVehicleEngineOn = false
+IsEnteringVehicle = false
+IsInVehicle = false
+QBCore = exports[Config.CoreName]:GetCoreObject()
 
 -- ███████ ██    ██ ███    ██  ██████ ████████ ██  ██████  ███    ██ ███████ 
 -- ██      ██    ██ ████   ██ ██         ██    ██ ██    ██ ████   ██ ██      
@@ -15,7 +14,7 @@ function HasVehicleKey(plate)
 	local has = false
 	TriggerEvent('cad-keys:getClientKeys')
 	Wait(100)
-	for _, v in pairs(keylist) do
+	for _, v in pairs(KeyList) do
 		if plate == v then
 			has = true
 			break
@@ -43,19 +42,22 @@ RegisterNetEvent('cad-keys:getClientKeys', function()
 	QBCore.Functions.TriggerCallback('cad-keys:getKeys', function(keys)
 		p:resolve(keys)
 	end)
-	keylist = Citizen.Await(keys)
+	KeyList = Citizen.Await(p)
 end)
 
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
-    TriggerEvent('cad-keys:deleteClientKeys')
+	CreateThread(function()
+		Wait(2000)
+		TriggerServerEvent('cad-keys:deleteWasteKeys')
+	end)
 end)
 
 RegisterNetEvent('cad-keys:addClientVehKeys', function(plate)
     TriggerServerEvent('cad-keys:addVehKeys', plate)
 end)
 
-RegisterNetEvent('cad-keys:deleteClientKeys', function()
-    TriggerServerEvent('cad-keys:deleteKeys')
+RegisterNetEvent('cad-keys:deleteClientKeys', function(plate)
+    TriggerServerEvent('cad-keys:deleteKeys', plate)
 end)
 
 RegisterNetEvent('vehiclekeys:client:SetOwner', function(plate)
@@ -70,7 +72,7 @@ RegisterNetEvent('cad-keys:toggleEngine', function()
 		if HasVehicleKey(plate) then
 			IsVehicleEngineOn = not IsVehicleEngineOn
 		else
-			QBCore.Functions.Notify(Config.Lang['error.you_dont_have_the_keys_of_the_vehicle'], 'error')
+			ShowNotification(Config.Lang['you_dont_have_keys'], 'error')
 		end
 	end
 end)
@@ -90,38 +92,46 @@ RegisterNetEvent('cad-keys:lockVehicle',function()
 			LoadAnimDict('anim@mp_player_intmenu@key_fob@')
 			TaskPlayAnim(ped, 'anim@mp_player_intmenu@key_fob@', 'fob_click', 3.0, 3.0, -1, 49, 0, false, false, false)
 			if vehLockStatus == 1 then
-				Wait(750)
+				Wait(500)
 				ClearPedTasks(ped)
-				TriggerServerEvent('InteractSound_SV:PlayWithinDistance', 5, 'lock', 0.3)
+				TriggerServerEvent('InteractSound_SV:PlayWithinDistance', 5, 'lock', 0.2)
 				SetVehicleDoorsLocked(veh, 2)
 				if (GetVehicleDoorLockStatus(veh) == 2) then
-					SetVehicleLights(veh, 2)
-					Wait(250)
-					SetVehicleLights(veh, 1)
-					Wait(200)
-					SetVehicleLights(veh, 0)
-					QBCore.Functions.Notify(Config.Lang['info.vehicle_locked'])
+					if not IsPedInAnyVehicle(ped) then
+						if GetIsVehicleEngineRunning(veh) then
+							SetVehicleEngineOn(veh, false, false, true)
+							IsVehicleEngineOn = false
+						end
+						SetVehicleLights(veh, 2)
+						Wait(250)
+						SetVehicleLights(veh, 1)
+						Wait(200)
+						SetVehicleLights(veh, 0)
+					end
+					ShowNotification(Config.Lang['vehicle_locked'])
 				else
-					QBCore.Functions.Notify(Config.Lang['info.something_went_wrong_with_the_locking_system'])
+					ShowNotification(Config.Lang['something_gone_wrong'])
 				end
 			else
-				Wait(750)
+				Wait(500)
 				ClearPedTasks(ped)
-				TriggerServerEvent('InteractSound_SV:PlayWithinDistance', 5, 'unlock', 0.3)
+				TriggerServerEvent('InteractSound_SV:PlayWithinDistance', 5, 'unlock', 0.2)
 				SetVehicleDoorsLocked(veh, 1)
 				if (GetVehicleDoorLockStatus(veh) == 1) then
-					SetVehicleLights(veh, 2)
-					Wait(250)
-					SetVehicleLights(veh, 1)
-					Wait(200)
-					SetVehicleLights(veh, 0)
-					QBCore.Functions.Notify(Config.Lang['info.vehicle_unlocked'])
+					if not IsPedInAnyVehicle(ped) then
+						SetVehicleLights(veh, 2)
+						Wait(250)
+						SetVehicleLights(veh, 1)
+						Wait(200)
+						SetVehicleLights(veh, 0)
+					end
+					ShowNotification(Config.Lang['vehicle_unlocked'])
 				else
-					QBCore.Functions.Notify(Config.Lang['info.something_went_wrong_with_the_locking_system'])
+					ShowNotification(Config.Lang['something_gone_wrong'])
 				end
 			end
 		else
-			QBCore.Functions.Notify(Config.Lang['error.you_dont_have_the_keys_of_the_vehicle'], 'error')
+			ShowNotification(Config.Lang['you_dont_have_keys'], 'error')
 		end
     end
 end)
@@ -134,8 +144,8 @@ end)
                                                                                                                                
 AddEventHandler("baseevents:enteringVehicle", function(targetVehicle, vehicleSeat, vehicleDisplayName)
 	CreateThread(function()
-		isEnteringVehicle = true
-		while DoesEntityExist(targetVehicle) and isEnteringVehicle do
+		IsEnteringVehicle = true
+		while DoesEntityExist(targetVehicle) and IsEnteringVehicle do
 			local ped = PlayerPedId()			
 			local veh = targetVehicle
             local lock = GetVehicleDoorLockStatus(veh)
@@ -169,18 +179,18 @@ AddEventHandler("baseevents:enteringVehicle", function(targetVehicle, vehicleSea
 end)
                                                                                                                            
 AddEventHandler("baseevents:enteringAborted", function()
-	isEnteringVehicle = false
+	IsEnteringVehicle = false
 end)
 
 AddEventHandler("baseevents:enteredVehicle", function(currentVehicle, currentSeat, vehicleDisplayName)
-	isEnteringVehicle = false
+	IsEnteringVehicle = false
 	CreateThread(function()
 		IsInVehicle = true
 		while DoesEntityExist(currentVehicle) and IsInVehicle do
 			local veh = currentVehicle
 			local plate = QBCore.Functions.GetPlate(veh)
 			local driver = (currentSeat == -1)
-			if driver then					
+			if driver then
 				if HasVehicleKey(plate) then
 					if not IsVehicleEngineOn then
 						SetVehicleEngineOn(veh, false, false, true)
@@ -194,25 +204,12 @@ AddEventHandler("baseevents:enteredVehicle", function(currentVehicle, currentSea
 					IsVehicleEngineOn = false
 				end
 			end
-			Wait(500)
+			Wait(100)
 		end
 	end)
 end)
 
 AddEventHandler("baseevents:leftVehicle", function(currentVehicle, currentSeat, vehicleDisplayName)
 	IsInVehicle = false
-	isEnteringVehicle = false
+	IsEnteringVehicle = false
 end)
-
-
--- ███████ ███    ██  ██████  ██ ███    ██ ███████ 
--- ██      ████   ██ ██       ██ ████   ██ ██      
--- █████   ██ ██  ██ ██   ███ ██ ██ ██  ██ █████   
--- ██      ██  ██ ██ ██    ██ ██ ██  ██ ██ ██      
--- ███████ ██   ████  ██████  ██ ██   ████ ███████ 
-                                                
-RegisterCommand("engine", function()
-	TriggerEvent("cad-keys:toggleEngine")
-end)
-RegisterKeyMapping('engine', 'Toggle Engine', 'keyboard', 'G')
-TriggerEvent('chat:addSuggestion', '/engine', 'Turn Vehicle Engine On/Off')

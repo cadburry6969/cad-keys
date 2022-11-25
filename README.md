@@ -1,64 +1,39 @@
-# Dependencies:
+# Dependencies
 
 - [qb-core](https://github.com/qbcore-framework/qb-core) (Latest)
-- [qb-target](https://github.com/BerkieBb/qb-target) (Latest)
+- [qb-target](https://github.com/qbcore-framework/qb-target) (Latest)
 
-## Installation:
+## Installation
 
-* Add item info to qb-inventory\html\js\app.js
+* Add item info to `qb-inventory\html\js\app.js`
 
-```
+```lua
 } else if (itemData.name == "cadkeys") {
-	$(".item-info-title").html(
-		'<p>' + itemData.label+ '</p>'
-	);
-	$(".item-info-description").html(
-		'<p>Vehicle ID: ' + itemData.info.citizenid +
-		'</p><p>Plate: ' + itemData.info.plate +'</p>'
-	);
+    $(".item-info-title").html('<p>' + itemData.label+ '</p>');
+    $(".item-info-description").html(
+        '<p>Vehicle ID: ' + itemData.info.citizenid +
+        '</p><p>Plate: ' + itemData.info.plate +'</p>'
+    );
 }
 ```
 
 * Add `images/carkeys.png` to `qb-inventory\html\images`
+* Add to `qb-core\shared\items.lua`:
 
-![carkeys](https://i.imgur.com/JmRS6v9.png)
-
-#### qb-core:
-
-Add to qb-core\shared\items.lua:
-
-```
+```lua
 ['cadkeys']  = { ['name'] = 'cadkeys', ['label'] = 'Vehicle Key', ['weight'] = 0, ['type'] = 'item', ['image'] = 'cadkeys.png', ['unique'] = true, ['useable'] = true, ['shouldClose'] = true, ['combinable'] = nil,['description'] = '' },
 ```
 
-Event:
+# Events and Event
 
-- Check vehicles key:
+`exports['cad-keys']:HasVehicleKey(plate)` -- Client Export
 
-```
-if exports['MojiaVehicleKeys']:CheckHasKey(plate) then
-```
+`TriggerEvent("cad-keys:toggleEngine")` -- Client Event
 
-- Lock/Unlock Vehicles:
+`TriggerEvent("cad-keys:lockVehicle")` -- Client Event
 
-```
-'MojiaVehicleKeys:client:lockVehicle'
-```
+`TriggerEvent("cad-keys:addClientVehKeys", plate)` -- Client Event
 
-- On/Off Engine:
+`TriggerEvent("cad-keys:deleteClientKeys", plate)` -- Client Event
 
-```
-'MojiaVehicleKeys:client:Engine'
-```
-
-- Add new key:
-
-```
-TriggerServerEvent('MojiaVehicleKeys:server:AddVehicleKey', plate, model)
-```
-
-- Change owner:
-
-```
-TriggerClientEvent('MojiaVehicleKeys:client:AddVehicleKey',target, plate, model)
-```
+`TriggerServerEvent("cad-keys:deleteWasteKeys")` -- Server Event

@@ -1,4 +1,4 @@
-local QBCore = exports[Config.CoreName]:GetCoreObject()
+QBCore = exports[Config.CoreName]:GetCoreObject()
 
 --  ██████  █████  ██      ██      ██████   █████   ██████ ██   ██ ███████ 
 -- ██      ██   ██ ██      ██      ██   ██ ██   ██ ██      ██  ██  ██      
@@ -37,7 +37,24 @@ RegisterNetEvent('cad-keys:addVehKeys', function(plate)
 	TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items['cadkeys'], 'add', 1)
 end)
 
-RegisterNetEvent('cad-keys:deleteKeys', function()
+RegisterNetEvent('cad-keys:deleteKeys', function(plate)
+	local src = source
+    local Player = QBCore.Functions.GetPlayer(src)
+    if Player then
+		local items = Player.Functions.GetItemsByName('cadkeys')
+		if items then
+			for _, v in pairs(items) do										
+				if v.info.citizenid == plate then
+					Player.Functions.RemoveItem(v.name, 1, v.slot)
+					TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items[v.name], 'remove', 1)
+				end
+			end
+		end
+    end
+end)
+
+-- Never use this event it can cause issues
+RegisterNetEvent('cad-keys:deleteWasteKeys', function()
 	local src = source
     local Player = QBCore.Functions.GetPlayer(src)
     if Player then
