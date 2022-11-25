@@ -28,6 +28,8 @@
 
 `exports['cad-keys']:HasVehicleKey(plate)` -- Client Export
 
+`exports['cad-keys']:GetVehicleByPlate(plate)` -- Client Export
+
 `TriggerEvent("cad-keys:toggleEngine")` -- Client Event
 
 `TriggerEvent("cad-keys:lockVehicle")` -- Client Event
