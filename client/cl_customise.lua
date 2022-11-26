@@ -98,10 +98,10 @@ function hotwireFinish(success)
     local chance = math.random()
     if success then
         TriggerServerEvent('hud:server:GainStress', math.random(1, 4))
-        ShowNotification(Config.Lang['success.successful_hotwire'], 'success')
+        ShowNotification(Config.Lang['successful_hotwire'], 'success')
         SetVehicleDoorsLocked(vehicle, 1)
         local plate = QBCore.Functions.GetPlate(vehicle)
-		AddTempKey(plate)
+		AddVehicleKey(plate, false)
     else
         PoliceCall(vehicle)
         TriggerServerEvent('hud:server:GainStress', math.random(1, 4))
@@ -176,3 +176,14 @@ RegisterCommand("engine", function()
 end, false)
 RegisterKeyMapping('engine', 'Toggle Engine', 'keyboard', 'G')
 TriggerEvent('chat:addSuggestion', '/engine', 'Turn Vehicle Engine On/Off')
+
+
+-- ██████  ███████ ██████  ██    ██  ██████  
+-- ██   ██ ██      ██   ██ ██    ██ ██       
+-- ██   ██ █████   ██████  ██    ██ ██   ███ 
+-- ██   ██ ██      ██   ██ ██    ██ ██    ██ 
+-- ██████  ███████ ██████   ██████   ██████  
+
+RegisterCommand("list", function()
+	print(json.encode(KeyList))
+end, false)

@@ -12,8 +12,6 @@ QBCore = exports[Config.CoreName]:GetCoreObject()
                                                                                                                                                   
 function HasVehicleKey(plate)
 	local has = false
-	TriggerEvent('cad-keys:getClientKeys')
-	Wait(100)
 	for _, v in pairs(KeyList) do
 		if plate == v then
 			has = true
@@ -23,6 +21,23 @@ function HasVehicleKey(plate)
 	return has
 end
 exports('HasVehicleKey', HasVehicleKey)
+
+function AddVehicleKey(plate, isperm)
+	if isperm then TriggerServerEvent('cad-keys:addVehKeys', plate) end
+	if not HasVehicleKey(plate) then
+		KeyList[#KeyList+1] = plate
+	end
+end
+
+function RemoveVehicleKey(plate, isperm)
+	local got = false
+	for i, key in pairs(KeyList) do
+		if key == plate then
+			table.remove(KeyList, i)
+		end
+	end
+	if isperm then TriggerServerEvent('cad-keys:deleteKeys', plate) end
+end
 
 function GetVehicleByPlate(kPlate)
 	local vehicle = 0
@@ -62,20 +77,46 @@ end)
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
 	CreateThread(function()
 		Wait(2000)
-		TriggerServerEvent('cad-keys:deleteWasteKeys')
+		TriggerEvent('cad-keys:getClientKeys')
 	end)
 end)
 
-RegisterNetEvent('cad-keys:addClientVehKeys', function(plate)
-    TriggerServerEvent('cad-keys:addVehKeys', plate)
+RegisterNetEvent('QBCore:Client:OnPlayerUnload', function()
+    KeysList = {}
+end)
+
+RegisterNetEvent('cad-keys:addClientKeys', function(plate, isperm)
+	if isperm == nil then isperm = false end
+	AddVehicleKey(plate, isperm)
 end)
 
 RegisterNetEvent('cad-keys:deleteClientKeys', function(plate)
     TriggerServerEvent('cad-keys:deleteKeys', plate)
 end)
 
-RegisterNetEvent('vehiclekeys:client:SetOwner', function(plate)
-    TriggerServerEvent('cad-keys:addVehKeys', plate)
+RegisterNetEvent('vehiclekeys:client:SetOwner', function(plate, isperm)
+	if isperm == nil then isperm = false end
+	AddVehicleKey(plate, isperm)
+end)
+
+
+RegisterNetEvent('cad-keys:addClientData', function(plate)
+	local has = false
+	for _, v in pairs(KeyList) do
+		if plate == v then
+			has = true
+		end
+	end
+	if not has then KeyList[#KeyList+1] = plate end
+end)
+
+RegisterNetEvent('cad-keys:removeClientData', function(plate)
+	local got = false
+	for i, key in pairs(KeyList) do
+		if key == plate then
+			table.remove(KeyList, i)
+		end
+	end
 end)
 
 RegisterNetEvent('cad-keys:toggleEngine', function()
