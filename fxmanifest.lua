@@ -19,6 +19,7 @@ server_scripts {
 }
 
 escrow_ignore {
+	'config.lua',
 	'client/cl_customise.lua',
 	'server/sv_customise.lua',
 }
