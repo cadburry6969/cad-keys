@@ -2,7 +2,7 @@ fx_version 'cerulean'
 game 'gta5'
 
 author 'Cadburry#7547'
-version '0.1.0'
+version '0.1'
 description 'NUI Vehicle Keys for QBCore Based Servers'
 
 shared_scripts {
